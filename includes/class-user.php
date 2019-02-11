@@ -66,32 +66,48 @@ class LearnDash_Muvi_User {
     /**
      * Update a Muvi user's password after updating their profile
      * 
-     * @param int       $user_id
-     * @return array    $response or nothing
+     * @param int           $wp_user_id
+     * @return array/bool   $response or false
      */
-    function profile_updated( $user_id ) {
+    function profile_updated( $wp_user_id ) {
         if ( ! isset( $_POST['pass1'] ) || '' == $_POST['pass1'] ) {
             return;
         }
 
-        $muvi_user_id = $this->get_muvi_user_id( $user_id );
+        $muvi_user_id = $this->get_muvi_user_id( $wp_user_id );
         if ( !empty( $muvi_user_id ) ) {
-            return $this->api->update_password( $muvi_user_id, $_POST['pass1'] );
+            $response = $this->api->update_password( $muvi_user_id, $_POST['pass1'] );
+
+            if ( $response['status'] == 'OK' ) {
+                return $response;
+            } else {
+                error_log( 'Problem upating the Muvi Account password through the API on profile update: ' . var_export( $response, true ) );
+            }
         }
+
+        return false;
     }
     
     /**
      * Update a Muvi user's password after they reset their WordPress password
      * 
-     * @param obj       $user
-     * @param str       $new_pass
-     * @return array    $response or nothing
+     * @param obj               $user
+     * @param str               $new_pass
+     * @return array/boolean    $response or false
      */
     public function reset_password( $user, $new_pass ) {
         $muvi_user_id = $this->get_muvi_user_id( $user->ID );
         if ( !empty( $muvi_user_id ) ) {
-            return $this->api->update_password( $muvi_user_id, $new_pass );
+            $response = $this->api->update_password( $muvi_user_id, $new_pass );
+
+            if ( $response['status'] == 'OK' ) {
+                return $response;
+            } else {
+                error_log( 'Problem upating the Muvi Account password through the API on password reset: ' . var_export( $response, true ) );
+            }
         }
+
+        return false;
     }
 
     /**
