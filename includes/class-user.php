@@ -28,7 +28,10 @@ class LearnDash_Muvi_User {
         $this->api = $api;
 
         // add actions
-        add_action( 'learndash_update_course_access', array( $this, 'course_access_updated'), 10, 4 );
+        //add_action( 'learndash_update_course_access', array( $this, 'course_access_updated'), 10, 4 );
+        add_action( 'woocommerce_created_customer', array( $this, 'woocommerce_created_user' ), 10, 3 );
+        add_action( 'edit_user_created_user', array( $this, 'wordpress_created_user' ), 10, 2 );
+
         add_action( 'profile_update', array( $this, 'profile_updated' ) );
         add_action( 'password_reset', array( $this, 'reset_password' ), 10, 2 );
     }
@@ -36,22 +39,25 @@ class LearnDash_Muvi_User {
     /**
      * When a WordPress user's LearnDash course access is updated, create a Muvi user if one doesn't already exist
      * 
-     * @param  int  	    $user_id
+     * The problem with this function is that the WordPress user's password ($wp_user->user_pass) is MD5 encrypted with a one-way hash.
+     * This function has been deprecated in favor of creating the Muvi user when a WordPress user is created
+     * 
+     * @param  int  	    $wp_user_id
      * @param  int  	    $course_id
      * @param  array  	    $access_list
      * @param  bool  	    $remove
      * @return int/bool     $primary_key_id or false
      */
-    public function course_access_updated( $user_id, $course_id, $access_list, $remove ) {
+    public function course_access_updated( $wp_user_id, $course_id, $access_list, $remove ) {
         $muvi_user_id = $this->get_muvi_user_id( $user_id );
 
         if ( empty( $muvi_user_id ) ) {
-            $wp_user = get_userdata( $user_id );
+            $wp_user = get_userdata( $wp_user_id );
 
             $response = $this->api->create_account( $wp_user->user_email, $wp_user->first_name . $wp_user->last_name, $wp_user->user_pass );
 
             if ( $response['status'] == 'OK' ) {
-                return add_user_meta( $user_id, $this->user_meta_key_muvi_user, $response['id'], true );
+                return add_user_meta( $wp_user_id, $this->user_meta_key_muvi_user, $response['id'], true );
             } else {
                 error_log( 'Problem creating Muvi Account through the API: ' . var_export( $response, true ) );
                 return false;
@@ -60,7 +66,50 @@ class LearnDash_Muvi_User {
         } else {
             return false;
         }
+    }
 
+    /**
+     * When a WordPress user is created by WooCommerce, create a Muvi user
+     * 
+     * @param  int  	    $wp_user_id
+     * @param  array  	    $new_customer_data
+     * @param  bool  	    $password_generated
+     * @return int/bool     $primary_key_id or false
+     */
+    public function woocommerce_created_user( $wp_user_id, $new_customer_data, $password_generated ) {
+        // Can't use "$wp_user->first_name" or "$wp_user->last_name" because it's a newly created user and this information doesn't exist on the account yet
+        // $wp_user = get_userdata( $wp_user_id );
+
+        $response = $this->api->create_account( $new_customer_data['user_email'], $new_customer_data['user_login'], $new_customer_data['user_pass'] );
+
+        if ( $response['status'] == 'OK' ) {
+            return add_user_meta( $wp_user_id, $this->user_meta_key_muvi_user, $response['id'], true );
+        } else {
+            error_log( 'Problem creating Muvi Account through the API (triggered by WooCommerce Add User): ' . var_export( $response, true ) );
+            return false;
+        }
+    }
+
+    /**
+     * When a WordPress user is created from the Add User screen, create a Muvi user
+     * 
+     * @param  int  	    $wp_user_id
+     * @param  bool  	    $notify
+     * @return int/bool     $primary_key_id or false
+     */
+    public function wordpress_created_user( $wp_user_id, $notify ) {
+        if ( ! isset( $_POST['pass1'] ) || '' == $_POST['pass1'] ) {
+            return;
+        }
+         
+        $response = $this->api->create_account( $_POST['email'], $_POST['user_login'], $_POST['pass1'] );
+
+        if ( $response['status'] == 'OK' ) {
+            return add_user_meta( $wp_user_id, $this->user_meta_key_muvi_user, $response['id'], true );
+        } else {
+            error_log( 'Problem creating Muvi Account through the API (triggered by WordPress Add User): ' . var_export( $response, true ) );
+            return false;
+        }
     }
 
     /**

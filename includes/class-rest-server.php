@@ -40,36 +40,8 @@ class LearnDash_Muvi_REST_Server extends WP_REST_Controller {
             'methods' => 'GET',
             'callback' => array( $this, 'course_access_callback' )
         ) );
-
-        $result = register_rest_route( $this->namespace, '/test', array(
-            'methods' => 'GET',
-            'callback' => array( $this, 'test_callback' )
-        ) );
     }
     
-    /**
-     * Callback function for "test" endpoint
-     */
-    public function test_callback( $data ) {
-
-        $response['result'] = 'Connection successful';
-        $response['random-number'] = rand(1000, 9999);
-
-        if ( class_exists( 'LiteSpeed_Cache_API' ) ) {
-            LiteSpeed_Cache_API::set_nocache();
-            $response['litespeed'] = "Successfully disabled LiteSpeed Cache on page";
-        }
-
-        $result = new WP_REST_Response( $response, 200 );
-
-        // Set headers.
-        $result->set_headers( array(
-            'Cache-Control' => 'no-cache, must-revalidate, max-age=0'
-        ) );
-
-        return $result;
-    }
-
     /**
      * Callback function for "course-access" endpoint
      * Needs course_id paramater and either Muvi user's "user_id" or "email"

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: LearnDash Muvi Integration
  * Description: Add functions for integrating LearnDash with the Muvi platform
- * Version: 1.0
+ * Version: 1.1
  * Author: Abundant Designs LLC
  * Author URI: https://www.abundantdesigns.com/
  * License: GPLv2 or later
