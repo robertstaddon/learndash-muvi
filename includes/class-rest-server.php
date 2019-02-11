@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) exit();
  */
 class LearnDash_Muvi_REST_Server extends WP_REST_Controller {
 
-	// LearnDash_Muvi_User class
+    // LearnDash_Muvi_User class
     private $muvi_user;
     
     //The namespace and version for the REST SERVER
@@ -24,7 +24,7 @@ class LearnDash_Muvi_REST_Server extends WP_REST_Controller {
      */
     public function __construct( $muvi_user ) {
 
-		// set $api
+        // set $api
         $this->muvi_user = $muvi_user;
 
         // add actions

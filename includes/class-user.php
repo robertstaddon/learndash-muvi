@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) exit();
  */
 class LearnDash_Muvi_User {
 
-	// LearnDash_Muvi_API class
+    // LearnDash_Muvi_API class
     private $api;
     
     // User meta key for holding the Muvi user id
@@ -24,7 +24,7 @@ class LearnDash_Muvi_User {
      */
     public function __construct( $api ) {
 
-		// set $api
+        // set $api
         $this->api = $api;
 
         // add actions
@@ -36,10 +36,10 @@ class LearnDash_Muvi_User {
     /**
      * When a WordPress user's LearnDash course access is updated, create a Muvi user if one doesn't already exist
      * 
-	 * @param  int  	    $user_id
-	 * @param  int  	    $course_id
-	 * @param  array  	    $access_list
-	 * @param  bool  	    $remove
+     * @param  int  	    $user_id
+     * @param  int  	    $course_id
+     * @param  array  	    $access_list
+     * @param  bool  	    $remove
      * @return int/bool     $primary_key_id or false
      */
     public function course_access_updated( $user_id, $course_id, $access_list, $remove ) {

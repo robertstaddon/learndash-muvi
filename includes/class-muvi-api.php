@@ -11,8 +11,8 @@ if ( ! defined( 'ABSPATH' ) ) exit();
  */
 class LearnDash_Muvi_API {
 
-	// Setting id for auth token
-	private $auth_setting_id;
+    // Setting id for auth token
+    private $auth_setting_id;
     
     // Root URL for Muvi API
     private $api_url = 'https://www.muvi.com/rest/';
@@ -25,7 +25,7 @@ class LearnDash_Muvi_API {
      */
     public function __construct( $auth_setting_id ) {
 
-		// set $auth_setting_id
+        // set $auth_setting_id
         $this->auth_setting_id = $auth_setting_id;
     }
 
@@ -64,12 +64,12 @@ class LearnDash_Muvi_API {
     }
 
     /**
-	 * Post to the Muvi API
+     * Post to the Muvi API
      *
      * @param  str      $method
      * @param  array    $url_params
      * @return str      $api_response
-	 */
+     */
     public function post( $method, $url_params = array() ) {
         // Add Authentication Key
         $url_params[ 'authToken' ] = get_option( $this->auth_setting_id );
@@ -81,12 +81,12 @@ class LearnDash_Muvi_API {
     }
 
     /**
-	 * Get from the Muvi API
+     * Get from the Muvi API
      *
      * @param  str      $method
      * @param  array    $url_params
      * @return str      $api_response
-	 */
+     */
     public function get( $method, $url_params = array() ) {
         // Add Authentication Key
         $url_params[ 'authToken' ] = get_option( $this->auth_setting_id );
