@@ -10,24 +10,9 @@ if ( ! defined( 'ABSPATH' ) ) exit();
  * This class is responsible for communicating with the Muvi API.
  */
 class LearnDash_Muvi_API {
-
-    // Setting id for auth token
-    private $auth_setting_id;
     
     // Root URL for Muvi API
     private $api_url = 'https://www.muvi.com/rest/';
-
-
-    /**
-     * Class __construct function
-     * 
-     * @param str   $auth_setting_id
-     */
-    public function __construct( $auth_setting_id ) {
-
-        // set $auth_setting_id
-        $this->auth_setting_id = $auth_setting_id;
-    }
 
     /**
      * Create Muvi Account
@@ -72,7 +57,8 @@ class LearnDash_Muvi_API {
      */
     public function post( $method, $url_params = array() ) {
         // Add Authentication Key
-        $url_params[ 'authToken' ] = get_option( $this->auth_setting_id );
+        if ( class_exists('LearnDash_Settings_Section_Muvi') )
+            $url_params[ 'authToken' ] = LearnDash_Settings_Section_Muvi::get_setting( 'auth_key' );
 
         // Post to Muvi API
         $response = wp_remote_post( $this->api_url . $method . '?' . http_build_query( $url_params ) );
@@ -89,7 +75,8 @@ class LearnDash_Muvi_API {
      */
     public function get( $method, $url_params = array() ) {
         // Add Authentication Key
-        $url_params[ 'authToken' ] = get_option( $this->auth_setting_id );
+        if ( class_exists('LearnDash_Settings_Section') )
+        $url_params[ 'authToken' ] = LearnDash_Settings_Section_Muvi::get_setting( 'auth_key' );
 
         // Get from Muvi API
         $response = wp_remote_get( $this->api_url . $method . '?' . http_build_query( $url_params ) );

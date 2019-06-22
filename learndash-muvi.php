@@ -58,11 +58,6 @@ class LearnDash_Muvi {
      */
     private static $rest_server;
 
-    /*
-     * The setting id for the Muvi auth token (set in settings and referenced in the API)
-     */
-    private static $auth_setting_id = 'learndash-muvi-auth-token';
-
     /**
      * Instantiate the main class
      *
@@ -164,14 +159,11 @@ class LearnDash_Muvi {
      * This function is responsible for including all necessary PHP files.
      */
     public function includes() {		
-        if ( is_admin() ) {
-            include LEARNDASH_MUVI_PLUGIN_PATH . '/includes/admin/class-settings.php';
-            self::$settings = new LearnDash_Muvi_Settings( self::$auth_setting_id );
-
-        }
+        include LEARNDASH_MUVI_PLUGIN_PATH . '/includes/admin/class-settings.php';
+        self::$settings = new LearnDash_Muvi_Settings();
         
         include LEARNDASH_MUVI_PLUGIN_PATH . '/includes/class-muvi-api.php';
-        self::$api = new LearnDash_Muvi_API( self::$auth_setting_id );
+        self::$api = new LearnDash_Muvi_API();
 
         include LEARNDASH_MUVI_PLUGIN_PATH . '/includes/class-user.php';
         self::$muvi_user = new LearnDash_Muvi_User( self::$api );
