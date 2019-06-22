@@ -32,7 +32,7 @@ class LearnDash_Muvi_Settings {
 
         // register our settings
         add_action( 'admin_init', array( $this, 'admin_init' ) );
-        
+
         // add our options page the the admin menu
         add_action( 'admin_menu', array( $this, 'admin_menu' ), 11 );
 
@@ -40,10 +40,32 @@ class LearnDash_Muvi_Settings {
         add_filter( 'plugin_action_links_' . plugin_basename( LEARNDASH_MUVI_FILE ) , array( $this, 'admin_settings_link' ) );
 
         // add tab to LearnDash area
-        add_filter( 'learndash_admin_tabs', array( $this, 'learndash_tab' ), 2, 1);
+        add_action( 'learndash_admin_tabs_set', array( $this, 'learndash_tab' ), 10, 2 );
 
         return $this;
 
+    }
+    
+    /**
+     * Implements hook admin_init to register our settings
+     */
+    public function admin_init() {
+        add_settings_section(
+            'learndash_muvi_auth_section', 
+            __( 'Authorization Settings', LEARNDASH_MUVI_DOMAIN ), 
+            array( $this, 'learndash_muvi_auth_section_description' ), 
+            $this->menu_slug
+        );
+    
+        add_settings_field( 
+            $this->auth_setting_id, 
+            __( 'API Authorization Key', LEARNDASH_MUVI_DOMAIN ), 
+            array( $this, 'learndash_muvi_auth_token_render' ), 
+            $this->menu_slug, 
+            'learndash_muvi_auth_section'
+        );
+        
+        register_setting( $this->settings_field_group, $this->auth_setting_id );
     }
 
 
@@ -77,28 +99,6 @@ class LearnDash_Muvi_Settings {
         return $links;
     }
     
-    
-    /**
-     * Implements hook admin_init to register our settings
-     */
-    public function admin_init() {
-        add_settings_section(
-            'learndash_muvi_auth_section', 
-            __( 'Authorization Settings', LEARNDASH_MUVI_DOMAIN ), 
-            array( $this, 'learndash_muvi_auth_section_description' ), 
-            $this->menu_slug
-        );
-    
-        add_settings_field( 
-            $this->auth_setting_id, 
-            __( 'API Authorization Key', LEARNDASH_MUVI_DOMAIN ), 
-            array( $this, 'learndash_muvi_auth_token_render' ), 
-            $this->menu_slug, 
-            'learndash_muvi_auth_section'
-        );
-        
-        register_setting( $this->settings_field_group, $this->auth_setting_id );
-    }
 
     /**
      * Output the description and field
@@ -131,16 +131,24 @@ class LearnDash_Muvi_Settings {
         <?php
     }
 
-    /*
-     * Add tab in LearnDash
-     */
-    public function learndash_tab( $admin_tabs ) {
-        $admin_tabs['muvi'] = array(
-            'link'  	=>      esc_url( admin_url( 'admin.php?page=' . $this->menu_slug ) ),
-            'name'  	=>      __( "Muvi", LEARNDASH_MUVI_DOMAIN ),
-            'id'    	=>      "admin_page_" . $this->menu_slug,
-            'menu_link' =>      "edit.php?post_type=sfwd-courses&page=sfwd-lms_sfwd_lms.php_post_type_sfwd-courses",
-        );
-        return $admin_tabs;
+    /**
+	 * Add tab
+	 * 
+	 * @param  string $current_screen_parent_file Current screen parent
+	 * @param  object $tabs                       Learndash_Admin_Menus_Tabs object
+	 */
+    public function learndash_tab( $current_screen_parent_file, $tabs ) {
+
+        if ( $current_screen_parent_file == 'admin.php?page=learndash_lms_settings' ) {
+            $tabs->add_admin_tab_item(
+                $current_screen_parent_file,
+                array(
+                    'link'			=> 	'admin.php?page=' . $this->menu_slug,
+                    'name'			=> 	esc_html( "Muvi", LEARNDASH_MUVI_DOMAIN ),
+                    'id'			=>  "admin_page_" . $this->menu_slug,
+                ),
+                45
+            );
+        }
     }
 }
