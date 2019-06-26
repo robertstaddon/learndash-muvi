@@ -76,7 +76,7 @@ class LearnDash_Muvi_API {
     public function get( $method, $url_params = array() ) {
         // Add Authentication Key
         if ( class_exists('LearnDash_Settings_Section') )
-        $url_params[ 'authToken' ] = LearnDash_Settings_Section_Muvi::get_setting( 'auth_key' );
+            $url_params[ 'authToken' ] = LearnDash_Settings_Section_Muvi::get_setting( 'auth_key' );
 
         // Get from Muvi API
         $response = wp_remote_get( $this->api_url . $method . '?' . http_build_query( $url_params ) );
